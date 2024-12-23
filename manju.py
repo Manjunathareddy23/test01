@@ -145,3 +145,6 @@ if st.button("Translate"):
             st.error(f"An error occurred: {e}")
     else:
         st.warning("Please enter a valid YouTube URL.")
+st.write("Developed by:")
+st.write("K.Manjunatha Reddy")
+st.write("6300138360")
