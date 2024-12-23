@@ -3,7 +3,6 @@ import yt_dlp
 import os
 from faster_whisper import WhisperModel
 from deep_translator import GoogleTranslator
-from pydub import AudioSegment
 from gtts import gTTS
 import av
 
@@ -93,32 +92,26 @@ if st.button("Translate"):
             audio_path = "audio.mp3"
             download_video_audio_separately(youtube_url, video_path, audio_path)
 
-            # Step 2: Convert MP3 to WAV for STT
-            st.write("Converting audio format...")
-            audio = AudioSegment.from_mp3(audio_path)
-            wav_path = "audio.wav"
-            audio.export(wav_path, format="wav")
-
-            # Step 3: Transcribe Audio using Faster Whisper
+            # Step 2: Transcribe Audio directly from MP3 (no conversion needed)
             st.write("Transcribing audio...")
             whisper_model = WhisperModel("base")
-            transcription = transcribe_audio(wav_path, whisper_model)
+            transcription = transcribe_audio(audio_path, whisper_model)  # Use the audio.mp3 directly
 
-            # Step 4: Translate Transcription
+            # Step 3: Translate Transcription
             st.write("Translating transcription...")
             translated_text = GoogleTranslator(source='auto', target=output_language).translate(transcription)
 
-            # Step 5: Generate Translated Audio
+            # Step 4: Generate Translated Audio
             st.write("Generating translated audio...")
             translated_audio_path = "translated_audio.mp3"
             text_to_speech(translated_text, translated_audio_path, language=output_language)
 
-            # Step 6: Replace Original Audio in Video using pyav
+            # Step 5: Replace Original Audio in Video using pyav
             st.write("Replacing audio in video...")
             output_video_path = "translated_video.mp4"
             replace_audio_in_video_pyav(video_path, translated_audio_path, output_video_path)
 
-            # Step 7: Provide Download Link
+            # Step 6: Provide Download Link
             st.success("Translation completed! Download your video below.")
             st.video(output_video_path)
             st.download_button(
@@ -129,7 +122,6 @@ if st.button("Translate"):
             )
 
             # Cleanup temporary files
-            os.remove(wav_path)
             os.remove(audio_path)
             os.remove(video_path)
             os.remove(translated_audio_path)
