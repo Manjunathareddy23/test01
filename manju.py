@@ -25,7 +25,7 @@ output_language = st.selectbox(
          
     ]
 )
-st.help("English (en)", "Spanish (es)", "French (fr)", "German (de)", "Italian (it)", 
+st.write("English (en)", "Spanish (es)", "French (fr)", "German (de)", "Italian (it)", 
     "Portuguese (pt)", "Russian (ru)", "Dutch (nl)", "Swedish (sv)", "Danish (da)", 
     "Finnish (fi)", "Czech (cs)", "Greek (el)", "Polish (pl)", "Hungarian (hu)", "Hindi (hi)", "Bengali (bn)", "Mandarin Chinese (zh)", "Japanese (ja)", "Korean (ko)", 
     "Arabic (ar)", "Tamil (ta)", "Telugu (te)", "Thai (th)", "Vietnamese (vi)", "Malayalam (ml)", "Marathi (mr)", "Gujarati (gu)", "Kannada (kn)", "Punjabi (pa)", 
