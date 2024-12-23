@@ -7,7 +7,7 @@ from faster_whisper import WhisperModel
 from deep_translator import GoogleTranslator
 from pydub import AudioSegment
 from gtts import gTTS
-import ffmpeg
+import subprocess
 
 # Streamlit App Title
 st.title("YouTube Video Language Translator")
@@ -27,8 +27,8 @@ output_language = st.selectbox(
 # Check for FFmpeg installation
 def check_ffmpeg():
     try:
-        ffmpeg.probe('')
-    except ffmpeg.Error:
+        subprocess.run(["ffmpeg", "-version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    except FileNotFoundError:
         raise EnvironmentError("FFmpeg is not installed or not found in PATH.")
 
 # Helper function to download audio using yt-dlp
@@ -53,11 +53,11 @@ def text_to_speech(translated_text, output_audio_file, language='en'):
 # Helper function to replace audio in video
 def replace_audio_in_video(video_file, audio_file, output_file):
     try:
-        input_video = ffmpeg.input(video_file)
-        input_audio = ffmpeg.input(audio_file)
-        ffmpeg.output(input_video, input_audio, output_file, vcodec='copy', acodec='aac').run()
-    except ffmpeg.Error as e:
-        raise RuntimeError(f"FFmpeg error: {e.stderr.decode()}")
+        subprocess.run([
+            "ffmpeg", "-i", video_file, "-i", audio_file, "-c:v", "copy", "-c:a", "aac", output_file
+        ], check=True)
+    except subprocess.CalledProcessError as e:
+        raise RuntimeError(f"FFmpeg error: {e}")
 
 # Process Button
 if st.button("Translate"):
@@ -120,3 +120,4 @@ if st.button("Translate"):
             st.error(f"An error occurred: {e}")
     else:
         st.warning("Please enter a valid YouTube URL.")
+
