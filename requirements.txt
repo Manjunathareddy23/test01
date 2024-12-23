@@ -3,5 +3,5 @@ yt-dlp
 faster-whisper
 deep-translator
 pydub
-gTTS
-ffmpeg
+gtts
+ffmpeg-python
