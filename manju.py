@@ -6,88 +6,19 @@ from deep_translator import GoogleTranslator
 from gtts import gTTS
 
 # Streamlit App Title
-st.markdown("""
-    <style>
-        h1 { text-align: center; font-family: 'Arial', sans-serif; }
-        h2 { font-family: 'Arial', sans-serif; color: #4CAF50; }
-        p, span { font-family: 'Arial', sans-serif; font-size: 16px; }
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-        }
-        .selectbox {
-            width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        .container {
-            width: 80%;
-            margin: 0 auto;
-        }
-        .input {
-            padding: 10px;
-            width: 100%;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-        .alert {
-            padding: 15px;
-            margin-top: 20px;
-            background-color: #f44336;
-            color: white;
-            border-radius: 5px;
-        }
-        .alert-success {
-            background-color: #4CAF50;
-        }
-        .alert-info {
-            background-color: #2196F3;
-        }
-    </style>
-""", unsafe_allow_html=True)
-
-# Streamlit Title
 st.title("YouTube Video Language Translator")
 st.write("Translate YouTube video audio to your desired language.")
 
 # Input: YouTube Link
 youtube_url = st.text_input("Enter YouTube video URL:")
 
+# Expanded List of Output Languages
 output_language = st.selectbox(
-    "Select your language:",
+    "Select the target language:",
     [
         "en", "te", "es", "fr", "de", "hi", "zh", "ar", "ja", "ko", "ru", "it", "pt", "tr", "pl", "nl", "sv", "da", "fi", "cs", "el", "vi", "th", "uk", "hu",
-        "ml", "mr", "bn", "gu", "ta", "kn", "or", "pa", "as", "ne", "si",  # Added Indian languages
-        "af", "sq", "hy", "bn", "bs", "ca", "hr", "cs", "da", "nl", "en", "eo", "tl", "et", "fi", "fr", "de", "el", "gu", "hi", "hu", "is", "id", "it", "ja", "jw", 
-        "km", "ko", "la", "lv", "lt", "mk", "ml", "mr", "my", "ne", "pl", "ps", "pt", "pa", "ro", "ru", "sr", "si", "sk", "sl", "es", "su", "sw", "sv", "ta", "te", 
-        "th", "tr", "uk", "ur", "vi", "cy", "xh", "zu"
     ]
 )
-
-st.write("Language Symbols:")
-st.write("English (en)", "Spanish (es)", "French (fr)", "German (de)", "Italian (it)", 
-    "Portuguese (pt)", "Russian (ru)", "Dutch (nl)", "Swedish (sv)", "Danish (da)", 
-    "Finnish (fi)", "Czech (cs)", "Greek (el)", "Polish (pl)", "Hungarian (hu)", "Hindi (hi)", "Bengali (bn)", "Mandarin Chinese (zh)", "Japanese (ja)", "Korean (ko)", 
-    "Arabic (ar)", "Tamil (ta)", "Telugu (te)", "Thai (th)", "Vietnamese (vi)", "Malayalam (ml)", "Marathi (mr)", "Gujarati (gu)", "Kannada (kn)", "Punjabi (pa)", 
-    "Oriya (or)", "Assamese (as)", "Nepali (ne)", "Sinhalese (si)", "Swahili (sw)", "Zulu (zu)", "Afrikaans (af)", "Albanian (sq)", "Armenian (hy)", "Basque (eu)", "Catalan (ca)", 
-    "Bosnian (bs)", "Esperanto (eo)", "Filipino (tl)", "Estonian (et)", "Icelandic (is)", 
-    "Indonesian (id)", "Javanese (jw)", "Khmer (km)", "Latvian (lv)", "Lithuanian (lt)", 
-    "Macedonian (mk)", "Polish (pl)", "Pashto (ps)", "Romanian (ro)", "Serbian (sr)", 
-    "Slovak (sk)", "Slovenian (sl)", "Sundanese (su)", "Urdu (ur)")
 
 # Helper function to download video and extract audio
 def download_video_audio_separately(youtube_url, video_output_path, audio_output_path):
@@ -117,7 +48,7 @@ def text_to_speech(translated_text, output_audio_file, language='en'):
     tts.save(output_audio_file)
 
 # Process Button
-if st.button("Translate", key="translate_button"):
+if st.button("Translate"):
     if youtube_url:
         try:
             # Step 1: Download Video and Audio Separately
