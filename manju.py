@@ -12,8 +12,7 @@ st.write("Translate YouTube video audio to your desired language.")
 # Input: YouTube Link
 youtube_url = st.text_input("Enter YouTube video URL:")
 
-# Expanded List of Output Languages
-import streamlit as st
+
 
 # Set the title for the app
 st.title("Language Selection")
