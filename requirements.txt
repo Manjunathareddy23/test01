@@ -1,4 +1,7 @@
-streamlit==1.20.0
-Pillow==9.2.0
-segno==1.6.0
-pyzxing==0.0.10
+streamlit
+moviepy
+whisper
+libretranslatepy
+srt
+yt-dlp
+gTTS
