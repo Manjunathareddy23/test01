@@ -1,16 +1,18 @@
-
 import streamlit as st
-from moviepy.editor import AudioFileClip, VideoFileClip
-import whisper
-from libretranslatepy import LibreTranslateAPI
-import srt
 import yt_dlp
 import os
+import wave
+import contextlib
+from faster_whisper import WhisperModel
+from deep_translator import GoogleTranslator
+from pydub import AudioSegment
+from pydub.playback import play
 from gtts import gTTS
+import moviepy.editor as mp
 
 # Streamlit App Title
 st.title("YouTube Video Language Translator")
-st.write("Paste a YouTube link to translate the video audio to your desired language.")
+st.write("Translate YouTube video audio to your desired language.")
 
 # Input: YouTube Link
 youtube_url = st.text_input("Enter YouTube video URL:")
@@ -19,31 +21,7 @@ youtube_url = st.text_input("Enter YouTube video URL:")
 output_language = st.selectbox(
     "Select the target language:",
     [
-        "en",  # English
-        "te",  # Telugu
-        "es",  # Spanish
-        "fr",  # French
-        "de",  # German
-        "hi",  # Hindi
-        "zh",  # Chinese (Simplified)
-        "ar",  # Arabic
-        "ja",  # Japanese
-        "ko",  # Korean
-        "ru",  # Russian
-        "it",  # Italian
-        "pt",  # Portuguese
-        "tr",  # Turkish
-        "pl",  # Polish
-        "nl",  # Dutch
-        "sv",  # Swedish
-        "da",  # Danish
-        "fi",  # Finnish
-        "cs",  # Czech
-        "el",  # Greek
-        "vi",  # Vietnamese
-        "th",  # Thai
-        "uk",  # Ukrainian
-        "hu",  # Hungarian
+        "en", "te", "es", "fr", "de", "hi", "zh", "ar", "ja", "ko", "ru", "it", "pt", "tr", "pl", "nl", "sv", "da", "fi", "cs", "el", "vi", "th", "uk", "hu",
     ]
 )
 
@@ -56,6 +34,18 @@ def download_audio(youtube_url, output_path):
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([youtube_url])
 
+# Helper function to get audio duration
+def get_audio_duration(file_path):
+    with contextlib.closing(wave.open(file_path, 'r')) as f:
+        frames = f.getnframes()
+        rate = f.getframerate()
+        return frames / float(rate)
+
+# Helper function to transcribe audio
+def transcribe_audio(audio_path, model):
+    segments, _ = model.transcribe(audio_path)
+    return " ".join(segment.text for segment in segments)
+
 # Helper function for text-to-speech conversion
 def text_to_speech(translated_text, output_audio_file, language='en'):
     tts = gTTS(text=translated_text, lang=language)
@@ -63,8 +53,8 @@ def text_to_speech(translated_text, output_audio_file, language='en'):
 
 # Helper function to replace audio in video
 def replace_audio_in_video(video_file, audio_file, output_file):
-    video = VideoFileClip(video_file)
-    audio = AudioFileClip(audio_file)
+    video = mp.VideoFileClip(video_file)
+    audio = mp.AudioFileClip(audio_file)
     video = video.set_audio(audio)
     video.write_videofile(output_file, codec='libx264')
 
@@ -77,23 +67,20 @@ if st.button("Translate"):
             audio_path = "audio.mp3"
             download_audio(youtube_url, audio_path)
 
-            # Extract audio as wav format
-            st.write("Extracting audio...")
-            audio_clip = AudioFileClip(audio_path)
-            audio_file = "audio.wav"
-            audio_clip.write_audiofile(audio_file)
+            # Convert MP3 to WAV
+            st.write("Converting audio format...")
+            audio = AudioSegment.from_mp3(audio_path)
+            wav_path = "audio.wav"
+            audio.export(wav_path, format="wav")
 
-            # Transcribe audio using Whisper
+            # Transcribe audio using Faster Whisper
             st.write("Transcribing audio...")
-            model = whisper.load_model("base")
-            transcription = model.transcribe(audio_file)["text"]
+            whisper_model = WhisperModel("base")
+            transcription = transcribe_audio(wav_path, whisper_model)
 
-            # Translate transcription using LibreTranslate
+            # Translate transcription using GoogleTranslator
             st.write("Translating transcription...")
-            translator = LibreTranslateAPI()
-            translated_text = translator.translate(
-                transcription, source="en", target=output_language
-            )
+            translated_text = GoogleTranslator(source='auto', target=output_language).translate(transcription)
 
             # Generate translated audio from text
             st.write("Generating translated audio...")
@@ -102,12 +89,12 @@ if st.button("Translate"):
 
             # Replace audio in video
             st.write("Replacing audio in video...")
-            video_file = "video.mp4"  # Assuming the video file is available
+            video_file = "video.mp4"  # Placeholder video file name
             output_video_file = "output_video.mp4"
             replace_audio_in_video(video_file, translated_audio_file, output_video_file)
 
             # Clean up temporary files
-            os.remove(audio_file)
+            os.remove(wav_path)
             os.remove(audio_path)
             os.remove(translated_audio_file)
 
