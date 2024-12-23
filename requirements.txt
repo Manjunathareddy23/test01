@@ -1,7 +1,7 @@
 streamlit
-moviepy
-whisper
-libretranslatepy
-srt
 yt-dlp
+faster-whisper
+deep-translator
+pydub
 gTTS
+moviepy
