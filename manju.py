@@ -63,8 +63,13 @@ if st.button("Translate"):
             translated_audio_path = "translated_audio.mp3"
             text_to_speech(translated_text, translated_audio_path, language=output_language)
 
-            # Step 5: Provide Download Link for Translated Audio
-            st.success("Translation completed! Download your translated audio below.")
+            # Step 5: Provide Play Audio Button and Download Link for Translated Audio
+            st.success("Translation completed! You can listen to the translated audio below.")
+            
+            # Play the translated audio in Streamlit
+            st.audio(translated_audio_path, format='audio/mp3')
+
+            # Provide a download button for the translated audio
             st.download_button(
                 label="Download Translated Audio",
                 data=open(translated_audio_path, "rb"),
