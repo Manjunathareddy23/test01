@@ -3,9 +3,9 @@ import streamlit as st
 from PIL import Image
 import tempfile
 import segno
-import pyzbar.pyzbar as pyzbar
 import base64
 import io
+from pyzxing import BarCodeReader
 
 # Function to generate QR code for the image path or URL
 def generate_qr(data):
@@ -19,12 +19,13 @@ def generate_qr(data):
 
 # Function to decode a QR code from an uploaded image
 def decode_qr(image):
-    img_array = np.array(image)
-    img_bgr = img_array[:, :, ::-1]
-    decoded_objects = pyzbar.decode(img_bgr)
-
-    if decoded_objects:
-        return decoded_objects[0].data.decode('utf-8')
+    reader = BarCodeReader()
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix=".png")
+    image.save(temp_file.name)
+    result = reader.decode(temp_file.name)
+    os.unlink(temp_file.name)
+    if result and "parsed" in result[0]:
+        return result[0]["parsed"]
     else:
         return "No QR code detected"
 
