@@ -4,4 +4,4 @@ faster-whisper
 deep-translator
 pydub
 gTTS
-moviepy
+ffmpeg
