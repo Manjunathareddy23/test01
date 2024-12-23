@@ -59,15 +59,15 @@ def replace_audio_in_video_pyav(video_file, audio_file, output_file):
     # Create an output container for the new video (mp4)
     output = av.open(output_file, 'w')
     
-    # Get the video and audio stream
+    # Get the video and audio streams
     video_stream = video.streams.video[0]
     audio_stream = audio.streams.audio[0]
     
     # Create a video stream for the output file
-    output_video_stream = output.add_stream(template=video_stream)
+    output_video_stream = output.add_stream(codec=video_stream.codec.name, rate=video_stream.rate, width=video_stream.width, height=video_stream.height)
     
     # Create an audio stream for the output file
-    output_audio_stream = output.add_stream(template=audio_stream)
+    output_audio_stream = output.add_stream(codec=audio_stream.codec.name, rate=audio_stream.rate, channels=audio_stream.channels, layout=audio_stream.layout.name)
     
     # Process video frames and write them to the output file
     for packet in video.demux(video_stream):
