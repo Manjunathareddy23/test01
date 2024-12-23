@@ -27,18 +27,15 @@ def download_video(youtube_url, output_video_path, output_audio_path):
     ydl_opts = {
         'format': 'bestvideo+bestaudio/best',
         'outtmpl': output_video_path,
-        'postprocessors': [],
+        'postprocessors': [
+            {'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'},
+        ],
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([youtube_url])
     
-    # Extract audio separately (MP3)
-    ydl_opts_audio = {
-        'format': 'bestaudio/best',
-        'outtmpl': output_audio_path,
-    }
-    with yt_dlp.YoutubeDL(ydl_opts_audio) as ydl:
-        ydl.download([youtube_url])
+    # Rename downloaded audio file if necessary
+    os.rename(output_video_path + ".mp3", output_audio_path)
 
 # Helper function to transcribe audio
 def transcribe_audio(audio_path, model):
