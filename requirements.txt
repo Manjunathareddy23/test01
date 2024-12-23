@@ -1,9 +1,7 @@
 streamlit
 yt-dlp
-faster-whisper
-deep-translator
 pydub
 gtts
-moviepy
-numpy
-imageio[ffmpeg]
+faster-whisper
+deep-translator
+av
