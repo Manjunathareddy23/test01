@@ -2,12 +2,10 @@ import streamlit as st
 import yt_dlp
 import os
 import wave
-import contextlib
 from faster_whisper import WhisperModel
 from deep_translator import GoogleTranslator
 from pydub import AudioSegment
 from gtts import gTTS
-import subprocess
 
 # Streamlit App Title
 st.title("YouTube Video Language Translator")
@@ -24,18 +22,14 @@ output_language = st.selectbox(
     ]
 )
 
-# Check for FFmpeg installation
-def check_ffmpeg():
-    try:
-        subprocess.run(["ffmpeg", "-version"], check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    except FileNotFoundError:
-        raise EnvironmentError("FFmpeg is not installed or not found in PATH.")
-
 # Helper function to download audio using yt-dlp
 def download_audio(youtube_url, output_path):
     ydl_opts = {
         'format': 'bestaudio/best',
         'outtmpl': output_path,
+        'postprocessors': [
+            {'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'},
+        ],
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([youtube_url])
@@ -50,23 +44,10 @@ def text_to_speech(translated_text, output_audio_file, language='en'):
     tts = gTTS(text=translated_text, lang=language)
     tts.save(output_audio_file)
 
-# Helper function to replace audio in video
-def replace_audio_in_video(video_file, audio_file, output_file):
-    try:
-        subprocess.run([
-            "ffmpeg", "-i", video_file, "-i", audio_file, "-c:v", "copy", "-c:a", "aac", output_file
-        ], check=True)
-    except subprocess.CalledProcessError as e:
-        raise RuntimeError(f"FFmpeg error: {e}")
-
 # Process Button
 if st.button("Translate"):
     if youtube_url:
         try:
-            # Check FFmpeg
-            st.write("Checking FFmpeg installation...")
-            check_ffmpeg()
-
             # Download YouTube video audio
             st.write("Downloading audio from video...")
             audio_path = "audio.mp3"
@@ -92,32 +73,23 @@ if st.button("Translate"):
             translated_audio_file = "translated_audio.mp3"
             text_to_speech(translated_text, translated_audio_file, language=output_language)
 
-            # Replace audio in video
-            st.write("Replacing audio in video...")
-            video_file = "video.mp4"  # Placeholder video file name
-            output_video_file = "output_video.mp4"
-            replace_audio_in_video(video_file, translated_audio_file, output_video_file)
+            # Provide download link for the translated audio
+            st.success("Translation completed!")
+            st.download_button(
+                label="Download Translated Audio",
+                data=open(translated_audio_file, "rb"),
+                file_name="translated_audio.mp3",
+                mime="audio/mp3"
+            )
 
             # Clean up temporary files
             os.remove(wav_path)
             os.remove(audio_path)
             os.remove(translated_audio_file)
 
-            # Provide download links for the final video
-            st.success("Translation completed!")
-            st.download_button(
-                label="Download Translated Video",
-                data=open(output_video_file, "rb"),
-                file_name="translated_video.mp4",
-                mime="video/mp4"
-            )
-
         except yt_dlp.utils.DownloadError:
             st.error("Failed to download video. Please check the URL or try again later.")
-        except EnvironmentError as e:
-            st.error(str(e))
         except Exception as e:
             st.error(f"An error occurred: {e}")
     else:
         st.warning("Please enter a valid YouTube URL.")
-
