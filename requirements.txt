@@ -5,3 +5,4 @@ gtts
 faster-whisper
 deep-translator
 av
+ffmpeg
