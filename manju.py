@@ -6,9 +6,8 @@ import contextlib
 from faster_whisper import WhisperModel
 from deep_translator import GoogleTranslator
 from pydub import AudioSegment
-from pydub.playback import play
 from gtts import gTTS
-import moviepy.editor as mp
+import ffmpeg
 
 # Streamlit App Title
 st.title("YouTube Video Language Translator")
@@ -53,10 +52,9 @@ def text_to_speech(translated_text, output_audio_file, language='en'):
 
 # Helper function to replace audio in video
 def replace_audio_in_video(video_file, audio_file, output_file):
-    video = mp.VideoFileClip(video_file)
-    audio = mp.AudioFileClip(audio_file)
-    video = video.set_audio(audio)
-    video.write_videofile(output_file, codec='libx264')
+    input_video = ffmpeg.input(video_file)
+    input_audio = ffmpeg.input(audio_file)
+    ffmpeg.output(input_video, input_audio, output_file, vcodec='copy', acodec='aac').run()
 
 # Process Button
 if st.button("Translate"):
