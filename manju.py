@@ -24,6 +24,13 @@ output_language = st.selectbox(
     ]
 )
 
+# Check for FFmpeg installation
+def check_ffmpeg():
+    try:
+        ffmpeg.probe('')
+    except ffmpeg.Error:
+        raise EnvironmentError("FFmpeg is not installed or not found in PATH.")
+
 # Helper function to download audio using yt-dlp
 def download_audio(youtube_url, output_path):
     ydl_opts = {
@@ -32,13 +39,6 @@ def download_audio(youtube_url, output_path):
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([youtube_url])
-
-# Helper function to get audio duration
-def get_audio_duration(file_path):
-    with contextlib.closing(wave.open(file_path, 'r')) as f:
-        frames = f.getnframes()
-        rate = f.getframerate()
-        return frames / float(rate)
 
 # Helper function to transcribe audio
 def transcribe_audio(audio_path, model):
@@ -52,14 +52,21 @@ def text_to_speech(translated_text, output_audio_file, language='en'):
 
 # Helper function to replace audio in video
 def replace_audio_in_video(video_file, audio_file, output_file):
-    input_video = ffmpeg.input(video_file)
-    input_audio = ffmpeg.input(audio_file)
-    ffmpeg.output(input_video, input_audio, output_file, vcodec='copy', acodec='aac').run()
+    try:
+        input_video = ffmpeg.input(video_file)
+        input_audio = ffmpeg.input(audio_file)
+        ffmpeg.output(input_video, input_audio, output_file, vcodec='copy', acodec='aac').run()
+    except ffmpeg.Error as e:
+        raise RuntimeError(f"FFmpeg error: {e.stderr.decode()}")
 
 # Process Button
 if st.button("Translate"):
     if youtube_url:
         try:
+            # Check FFmpeg
+            st.write("Checking FFmpeg installation...")
+            check_ffmpeg()
+
             # Download YouTube video audio
             st.write("Downloading audio from video...")
             audio_path = "audio.mp3"
@@ -107,6 +114,8 @@ if st.button("Translate"):
 
         except yt_dlp.utils.DownloadError:
             st.error("Failed to download video. Please check the URL or try again later.")
+        except EnvironmentError as e:
+            st.error(str(e))
         except Exception as e:
             st.error(f"An error occurred: {e}")
     else:
