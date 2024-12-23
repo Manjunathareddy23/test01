@@ -13,12 +13,90 @@ st.write("Translate YouTube video audio to your desired language.")
 youtube_url = st.text_input("Enter YouTube video URL:")
 
 # Expanded List of Output Languages
+import streamlit as st
+
+# Set the title for the app
+st.title("Language Selection")
+
+# CSS to customize the layout of the dropdowns
+st.markdown("""
+    <style>
+        .dropdown-container {
+            display: flex;
+            justify-content: space-around;
+        }
+        .dropdown-container select {
+            width: 250px;
+            margin: 10px;
+        }
+    </style>
+""", unsafe_allow_html=True)
+
+# European languages dropdown
+european_languages = [
+    "English (en)", "Spanish (es)", "French (fr)", "German (de)", "Italian (it)", 
+    "Portuguese (pt)", "Russian (ru)", "Dutch (nl)", "Swedish (sv)", "Danish (da)", 
+    "Finnish (fi)", "Czech (cs)", "Greek (el)", "Polish (pl)", "Hungarian (hu)"
+]
+
+# Asian languages dropdown
+asian_languages = [
+    "Hindi (hi)", "Bengali (bn)", "Mandarin Chinese (zh)", "Japanese (ja)", "Korean (ko)", 
+    "Arabic (ar)", "Tamil (ta)", "Telugu (te)", "Thai (th)", "Vietnamese (vi)"
+]
+
+# Indian languages dropdown
+indian_languages = [
+    "Malayalam (ml)", "Marathi (mr)", "Gujarati (gu)", "Kannada (kn)", "Punjabi (pa)", 
+    "Oriya (or)", "Assamese (as)", "Nepali (ne)", "Sinhalese (si)"
+]
+
+# African languages dropdown
+african_languages = [
+    "Swahili (sw)", "Zulu (zu)"
+]
+
+# Additional languages dropdown
+additional_languages = [
+    "Afrikaans (af)", "Albanian (sq)", "Armenian (hy)", "Basque (eu)", "Catalan (ca)", 
+    "Bosnian (bs)", "Esperanto (eo)", "Filipino (tl)", "Estonian (et)", "Icelandic (is)", 
+    "Indonesian (id)", "Javanese (jw)", "Khmer (km)", "Latvian (lv)", "Lithuanian (lt)", 
+    "Macedonian (mk)", "Polish (pl)", "Pashto (ps)", "Romanian (ro)", "Serbian (sr)", 
+    "Slovak (sk)", "Slovenian (sl)", "Sundanese (su)", "Urdu (ur)"
+]
+
+# Create side-by-side dropdowns using columns
+col1, col2, col3, col4, col5 = st.columns(5)
+
+with col1:
+    european_selected = st.selectbox("European Languages", european_languages)
+
+with col2:
+    asian_selected = st.selectbox("Asian Languages", asian_languages)
+
+with col3:
+    indian_selected = st.selectbox("Indian Languages", indian_languages)
+
+with col4:
+    african_selected = st.selectbox("African Languages", african_languages)
+
+with col5:
+    additional_selected = st.selectbox("Additional Languages", additional_languages)
+
+
+
+
 output_language = st.selectbox(
-    "Select the target language:",
+    "Select your language:",
     [
         "en", "te", "es", "fr", "de", "hi", "zh", "ar", "ja", "ko", "ru", "it", "pt", "tr", "pl", "nl", "sv", "da", "fi", "cs", "el", "vi", "th", "uk", "hu",
+        "ml", "mr", "bn", "gu", "ta", "kn", "or", "pa", "as", "ne", "si",  # Added Indian languages
+        "af", "sq", "hy", "bn", "bs", "ca", "hr", "cs", "da", "nl", "en", "eo", "tl", "et", "fi", "fr", "de", "el", "gu", "hi", "hu", "is", "id", "it", "ja", "jw", 
+        "km", "ko", "la", "lv", "lt", "mk", "ml", "mr", "my", "ne", "pl", "ps", "pt", "pa", "ro", "ru", "sr", "si", "sk", "sl", "es", "su", "sw", "sv", "ta", "te", 
+        "th", "tr", "uk", "ur", "vi", "cy", "xh", "zu"
     ]
 )
+
 
 # Helper function to download video and extract audio
 def download_video_audio_separately(youtube_url, video_output_path, audio_output_path):
