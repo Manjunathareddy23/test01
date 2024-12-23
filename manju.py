@@ -25,6 +25,7 @@ output_language = st.selectbox(
          
     ]
 )
+st.write("Language Symbols:")
 st.write("English (en)", "Spanish (es)", "French (fr)", "German (de)", "Italian (it)", 
     "Portuguese (pt)", "Russian (ru)", "Dutch (nl)", "Swedish (sv)", "Danish (da)", 
     "Finnish (fi)", "Czech (cs)", "Greek (el)", "Polish (pl)", "Hungarian (hu)", "Hindi (hi)", "Bengali (bn)", "Mandarin Chinese (zh)", "Japanese (ja)", "Korean (ko)", 
