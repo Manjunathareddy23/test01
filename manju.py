@@ -1,11 +1,11 @@
 import streamlit as st
 import yt_dlp
 import os
-import wave
 from faster_whisper import WhisperModel
 from deep_translator import GoogleTranslator
 from pydub import AudioSegment
 from gtts import gTTS
+from moviepy.editor import VideoFileClip, AudioFileClip
 
 # Streamlit App Title
 st.title("YouTube Video Language Translator")
@@ -22,17 +22,19 @@ output_language = st.selectbox(
     ]
 )
 
-# Helper function to download audio using yt-dlp
-def download_audio(youtube_url, output_path):
+# Helper function to download video and extract audio
+def download_video(youtube_url, output_video_path, output_audio_path):
     ydl_opts = {
-        'format': 'bestaudio/best',
-        'outtmpl': output_path,
+        'format': 'bestvideo+bestaudio/best',
+        'outtmpl': output_video_path,
         'postprocessors': [
             {'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'},
         ],
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([youtube_url])
+    # Rename downloaded audio file
+    os.rename(output_video_path + ".mp3", output_audio_path)
 
 # Helper function to transcribe audio
 def transcribe_audio(audio_path, model):
@@ -44,48 +46,64 @@ def text_to_speech(translated_text, output_audio_file, language='en'):
     tts = gTTS(text=translated_text, lang=language)
     tts.save(output_audio_file)
 
+# Helper function to replace audio in video
+def replace_audio_in_video(video_file, audio_file, output_file):
+    video = VideoFileClip(video_file)
+    audio = AudioFileClip(audio_file)
+    video = video.set_audio(audio)
+    video.write_videofile(output_file, codec="libx264", audio_codec="aac")
+
 # Process Button
 if st.button("Translate"):
     if youtube_url:
         try:
-            # Download YouTube video audio
-            st.write("Downloading audio from video...")
+            # Step 1: Download Video and Extract Audio
+            st.write("Downloading video and extracting audio...")
+            video_path = "video.mp4"
             audio_path = "audio.mp3"
-            download_audio(youtube_url, audio_path)
+            download_video(youtube_url, video_path, audio_path)
 
-            # Convert MP3 to WAV
+            # Step 2: Convert MP3 to WAV for STT
             st.write("Converting audio format...")
             audio = AudioSegment.from_mp3(audio_path)
             wav_path = "audio.wav"
             audio.export(wav_path, format="wav")
 
-            # Transcribe audio using Faster Whisper
+            # Step 3: Transcribe Audio using Faster Whisper
             st.write("Transcribing audio...")
             whisper_model = WhisperModel("base")
             transcription = transcribe_audio(wav_path, whisper_model)
 
-            # Translate transcription using GoogleTranslator
+            # Step 4: Translate Transcription
             st.write("Translating transcription...")
             translated_text = GoogleTranslator(source='auto', target=output_language).translate(transcription)
 
-            # Generate translated audio from text
+            # Step 5: Generate Translated Audio
             st.write("Generating translated audio...")
-            translated_audio_file = "translated_audio.mp3"
-            text_to_speech(translated_text, translated_audio_file, language=output_language)
+            translated_audio_path = "translated_audio.mp3"
+            text_to_speech(translated_text, translated_audio_path, language=output_language)
 
-            # Provide download link for the translated audio
-            st.success("Translation completed!")
+            # Step 6: Replace Original Audio in Video
+            st.write("Replacing audio in video...")
+            output_video_path = "translated_video.mp4"
+            replace_audio_in_video(video_path, translated_audio_path, output_video_path)
+
+            # Step 7: Provide Download Link
+            st.success("Translation completed! Download your video below.")
+            st.video(output_video_path)
             st.download_button(
-                label="Download Translated Audio",
-                data=open(translated_audio_file, "rb"),
-                file_name="translated_audio.mp3",
-                mime="audio/mp3"
+                label="Download Translated Video",
+                data=open(output_video_path, "rb"),
+                file_name="translated_video.mp4",
+                mime="video/mp4"
             )
 
-            # Clean up temporary files
+            # Cleanup temporary files
             os.remove(wav_path)
             os.remove(audio_path)
-            os.remove(translated_audio_file)
+            os.remove(video_path)
+            os.remove(translated_audio_path)
+            os.remove(output_video_path)
 
         except yt_dlp.utils.DownloadError:
             st.error("Failed to download video. Please check the URL or try again later.")
