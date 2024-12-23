@@ -15,7 +15,17 @@ youtube_url = st.text_input("Enter YouTube video URL:")
 output_language = st.selectbox(
     "Select your language:",
     [
-         "English (en)", "Spanish (es)", "French (fr)", "German (de)", "Italian (it)", 
+   
+        "en", "te", "es", "fr", "de", "hi", "zh", "ar", "ja", "ko", "ru", "it", "pt", "tr", "pl", "nl", "sv", "da", "fi", "cs", "el", "vi", "th", "uk", "hu",
+        "ml", "mr", "bn", "gu", "ta", "kn", "or", "pa", "as", "ne", "si",  # Added Indian languages
+        "af", "sq", "hy", "bn", "bs", "ca", "hr", "cs", "da", "nl", "en", "eo", "tl", "et", "fi", "fr", "de", "el", "gu", "hi", "hu", "is", "id", "it", "ja", "jw", 
+        "km", "ko", "la", "lv", "lt", "mk", "ml", "mr", "my", "ne", "pl", "ps", "pt", "pa", "ro", "ru", "sr", "si", "sk", "sl", "es", "su", "sw", "sv", "ta", "te", 
+        "th", "tr", "uk", "ur", "vi", "cy", "xh", "zu"
+    
+         
+    ]
+)
+st.help("English (en)", "Spanish (es)", "French (fr)", "German (de)", "Italian (it)", 
     "Portuguese (pt)", "Russian (ru)", "Dutch (nl)", "Swedish (sv)", "Danish (da)", 
     "Finnish (fi)", "Czech (cs)", "Greek (el)", "Polish (pl)", "Hungarian (hu)", "Hindi (hi)", "Bengali (bn)", "Mandarin Chinese (zh)", "Japanese (ja)", "Korean (ko)", 
     "Arabic (ar)", "Tamil (ta)", "Telugu (te)", "Thai (th)", "Vietnamese (vi)", "Malayalam (ml)", "Marathi (mr)", "Gujarati (gu)", "Kannada (kn)", "Punjabi (pa)", 
@@ -23,9 +33,7 @@ output_language = st.selectbox(
     "Bosnian (bs)", "Esperanto (eo)", "Filipino (tl)", "Estonian (et)", "Icelandic (is)", 
     "Indonesian (id)", "Javanese (jw)", "Khmer (km)", "Latvian (lv)", "Lithuanian (lt)", 
     "Macedonian (mk)", "Polish (pl)", "Pashto (ps)", "Romanian (ro)", "Serbian (sr)", 
-    "Slovak (sk)", "Slovenian (sl)", "Sundanese (su)", "Urdu (ur)",
-    ]
-)
+    "Slovak (sk)", "Slovenian (sl)", "Sundanese (su)", "Urdu (ur)")
 
 
 # Helper function to download video and extract audio
