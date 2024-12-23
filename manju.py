@@ -4,7 +4,7 @@ import os
 from faster_whisper import WhisperModel
 from deep_translator import GoogleTranslator
 from gtts import gTTS
-import av
+from moviepy.editor import VideoFileClip, AudioFileClip
 
 # Streamlit App Title
 st.title("YouTube Video Language Translator")
@@ -48,37 +48,19 @@ def text_to_speech(translated_text, output_audio_file, language='en'):
     tts = gTTS(text=translated_text, lang=language)
     tts.save(output_audio_file)
 
-# Helper function to replace audio in video using pyav
-def replace_audio_in_video_pyav(video_file, audio_file, output_file):
-    # Open video file
-    video = av.open(video_file)
+# Helper function to replace audio in video using moviepy
+def replace_audio_in_video_moviepy(video_file, audio_file, output_file):
+    # Load video file
+    video_clip = VideoFileClip(video_file)
     
-    # Open audio file
-    audio = av.open(audio_file)
+    # Load the translated audio file
+    audio_clip = AudioFileClip(audio_file)
     
-    # Create an output container for the new video (mp4)
-    output = av.open(output_file, 'w')
+    # Set the video audio to the translated audio
+    video_clip = video_clip.set_audio(audio_clip)
     
-    # Get the video and audio streams
-    video_stream = video.streams.video[0]
-    audio_stream = audio.streams.audio[0]
-    
-    # Create a video stream for the output file (add codec as positional argument)
-    output_video_stream = output.add_stream(video_stream.codec.name, width=video_stream.width, height=video_stream.height, pix_fmt=video_stream.pix_fmt)
-    
-    # Create an audio stream for the output file (add codec as positional argument)
-    output_audio_stream = output.add_stream(audio_stream.codec.name, channels=audio_stream.channels, layout=audio_stream.layout.name, rate=audio_stream.rate)
-    
-    # Process video frames and write them to the output file
-    for packet in video.demux(video_stream):
-        output.mux(packet)
-    
-    # Process audio frames and write them to the output file
-    for packet in audio.demux(audio_stream):
-        output.mux(packet)
-    
-    # Close the output container
-    output.close()
+    # Write the final video with replaced audio
+    video_clip.write_videofile(output_file, codec="libx264", audio_codec="aac")
 
 # Process Button
 if st.button("Translate"):
@@ -104,10 +86,10 @@ if st.button("Translate"):
             translated_audio_path = "translated_audio.mp3"
             text_to_speech(translated_text, translated_audio_path, language=output_language)
 
-            # Step 5: Replace Original Audio in Video using pyav
+            # Step 5: Replace Original Audio in Video using moviepy
             st.write("Replacing audio in video...")
             output_video_path = "translated_video.mp4"
-            replace_audio_in_video_pyav(video_path, translated_audio_path, output_video_path)
+            replace_audio_in_video_moviepy(video_path, translated_audio_path, output_video_path)
 
             # Step 6: Provide Download Link
             st.success("Translation completed! Download your video below.")
