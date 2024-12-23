@@ -23,19 +23,21 @@ output_language = st.selectbox(
 )
 
 # Helper function to download video and extract audio
-def download_video(youtube_url, output_video_path, output_audio_path):
+def download_video_audio_separately(youtube_url, video_output_path, audio_output_path):
+    # yt-dlp options for downloading audio and video separately
     ydl_opts = {
-        'format': 'bestvideo+bestaudio/best',
-        'outtmpl': output_video_path,
-        'postprocessors': [
-            {'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3', 'preferredquality': '192'},
-        ],
+        'format': 'bestvideo',  # Download the best available video
+        'outtmpl': video_output_path,  # Output path for the video
     }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download([youtube_url])
     
-    # Rename downloaded audio file if necessary
-    os.rename(output_video_path + ".mp3", output_audio_path)
+    ydl_opts = {
+        'format': 'bestaudio',  # Download the best available audio
+        'outtmpl': audio_output_path,  # Output path for the audio
+    }
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([youtube_url])
 
 # Helper function to transcribe audio
 def transcribe_audio(audio_path, model):
@@ -85,11 +87,11 @@ def replace_audio_in_video_pyav(video_file, audio_file, output_file):
 if st.button("Translate"):
     if youtube_url:
         try:
-            # Step 1: Download Video and Extract Audio
+            # Step 1: Download Video and Audio Separately
             st.write("Downloading video and extracting audio...")
             video_path = "video.mp4"
             audio_path = "audio.mp3"
-            download_video(youtube_url, video_path, audio_path)
+            download_video_audio_separately(youtube_url, video_path, audio_path)
 
             # Step 2: Convert MP3 to WAV for STT
             st.write("Converting audio format...")
