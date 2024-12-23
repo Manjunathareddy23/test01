@@ -9,6 +9,64 @@ from gtts import gTTS
 st.title("YouTube Video Language Translator")
 st.write("Translate YouTube video audio to your desired language.")
 
+st.markdown(
+    """
+    <style>
+    /* Set the background */
+    .stApp {
+        background: linear-gradient(to right, #1e3c72, #2a5298); 
+        color: white;
+        font-family: 'Arial', sans-serif;
+    }
+
+    /* Style the input box */
+    .stTextInput input {
+        background: rgba(255, 255, 255, 0.8);
+        color: black;
+        border: 2px solid white;
+        border-radius: 10px;
+    }
+
+    /* Style the button */
+    div.stButton > button {
+        background-color: #0078d7;
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    div.stButton > button:hover {
+        background-color: #005bb5;
+    }
+
+    /* Style the audio player */
+    audio {
+        background-color: white;
+        border-radius: 10px;
+        margin-top: 10px;
+    }
+
+    /* Style the select box */
+    .stSelectbox select {
+        background: rgba(255, 255, 255, 0.8);
+        color: black;
+        border: 2px solid white;
+        border-radius: 10px;
+    }
+
+    /* Style headers */
+    h1 {
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    }
+    </style>
+    """,
+    unsafe_allow_html=True
+)
+
 # Input: YouTube Link
 youtube_url = st.text_input("Enter YouTube video URL:")
 
