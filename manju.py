@@ -9,6 +9,7 @@ from gtts import gTTS
 st.title("YouTube Video Language Translator")
 st.write("Translate YouTube video audio to your desired language.")
 
+
 st.markdown(
     """
     <style>
@@ -145,6 +146,10 @@ if st.button("Translate"):
             st.error(f"An error occurred: {e}")
     else:
         st.warning("Please enter a valid YouTube URL.")
-st.write("Developed by:")
-st.write("K.Manjunatha Reddy")
-st.write("6300138360")
+st.markdown(
+    """
+    ---
+    **Developed by:** K. Manjunatha Reddy  
+    **Contact:** [6300138360](tel:6300138360)
+    """
+)
